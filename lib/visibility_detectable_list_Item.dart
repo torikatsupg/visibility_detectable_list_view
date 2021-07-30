@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 
 class VisibilityDetectableListItem extends StatefulWidget {
-  const VisibilityDetectableListItem(
-      {required this.child, required this.listViewKey, Key? key})
-      : super(key: key);
+  const VisibilityDetectableListItem({
+    required this.child,
+    required this.listViewKey,
+    required this.controller,
+    Key? key,
+  }) : super(key: key);
 
   final Widget child;
   final GlobalKey listViewKey;
+  final ScrollController controller;
 
   @override
   createState() => _VisibilityDetectableListItemState();
@@ -14,9 +18,29 @@ class VisibilityDetectableListItem extends StatefulWidget {
 
 class _VisibilityDetectableListItemState
     extends State<VisibilityDetectableListItem> {
+  bool isVisible = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance?.addPostFrameCallback(
+      (_) => widget.controller.addListener(_onScroll),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.controller.removeListener(_onScroll);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return widget.child;
+    _onScroll(); // 初回ビルド時のみ条件判定を行う
+    return Container(
+      color: isVisible ? Colors.amber : null,
+      child: widget.child,
+    );
   }
 
   void _onScroll() {
@@ -34,9 +58,9 @@ class _VisibilityDetectableListItemState
             listViewRenderBox.size.height;
 
     if (listItemBottomPosition <= listViewBottomPosition) {
-      // inside
+      setState(() => isVisible = true); // inside
     } else {
-      // outside
+      setState(() => isVisible = false); // outside
     }
   }
 }

@@ -3,7 +3,7 @@
 A sample of list view which detect visibility.
 
 This sample application works like this.
-![](./docs/image.gif)
+<img src="./docs/image.gif" height="400">
 
 ## Getting Started
 ```
